@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkBoxd — race from film to film</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="linkboxd.css">
+  <script src="linkboxd.js"></script>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="wordmark">link<span class="accent">boxd</span><span class="sub">race from film to film</span></div>
+    <div class="topbar-right">
+      <button type="button" class="pill-btn" id="btnHowShort" title="How it works">rules</button>
+      <button type="button" class="pill-btn primary" id="btnNewRace">new race</button>
+    </div>
+  </div>
+
+  <!-- ============ SETUP / HERO ============ -->
+  <section class="hero active" id="heroScreen">
+    <div class="wrap">
+      <h1>Every film is <span class="g">one degree</span> away<br>from another.</h1>
+      <p>You get a starting film and a target(person, cast member or crew). Click your way through casts and
+        filmographies to connect them in as few hops as possible.</p>
+
+      <div class="mode-grid">
+        <div class="mode-card">
+          <h3>Quick race</h3>
+          <p>Solo run against the clock. We'll pick a start and a target that are guaranteed to connect.</p>
+          <button type="button" class="btn-full orange" id="btnQuick">Start solo race</button>
+        </div>
+        <div class="mode-card">
+          <h3>Race with friends</h3>
+          <div class="field">
+            <label for="playerName">Your name</label>
+            <input type="text" id="playerName" placeholder="e.g. Sam" maxlength="18">
+          </div>
+          <div class="field">
+            <label for="roomCode">Room code (leave blank to create one)</label>
+            <input type="text" id="roomCode" placeholder="e.g. K7QM" maxlength="6">
+          </div>
+          <button type="button" class="btn-full outline" id="btnJoinRoom">Create / join room</button>
+          <div class="err-msg" id="roomErr"></div>
+        </div>
+      </div>
+
+      <div class="how-it-works" id="howItWorks">
+        <h4>How it works</h4>
+        <div class="steps">
+          <div class="step"><b>1. Get your goal</b>You start on one film and need to reach a target film, actor, or
+            director.</div>
+          <div class="step"><b>2. Click through connections</b>From a film, click into its cast or director. From a
+            person, click into their filmography.</div>
+          <div class="step"><b>3. Chain your way there</b>Each click is one move. Reach the target in as few moves as
+            possible.</div>
+          <div class="step"><b>4. Race friends live</b>Create a room, share the code, and watch everyone's move count
+            update as they go.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RACE SCREEN ============ -->
+  <section class="race-shell" id="raceScreen">
+    <div class="race-header">
+      <div class="goal-row">
+        <div class="goal-chip start">
+          <div class="thumb" id="startThumb"></div>
+          <div class="meta">
+            <div class="tag">start</div>
+            <div class="name" id="startName">—</div>
+          </div>
+        </div>
+        <div class="goal-arrow">→ ⋯ →</div>
+        <div class="goal-chip target">
+          <div class="thumb" id="targetThumb"></div>
+          <div class="meta">
+            <div class="tag">target</div>
+            <div class="name" id="targetName">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat">
+          <div class="n" id="statMoves">0</div>
+          <div class="l">moves</div>
+        </div>
+        <div class="stat">
+          <div class="n" id="statTime">0:00</div>
+          <div class="l">time</div>
+        </div>
+        <div class="stat" id="statParBox" style="display:none;">
+          <div class="n" id="statPar">—</div>
+          <div class="l">best known</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button type="button" class="pill-btn" id="btnGiveUp">give up</button>
+        <button type="button" class="pill-btn" id="btnHowInline">rules</button>
+      </div>
+    </div>
+
+    <div class="board-cols">
+      <div class="main-col">
+        <div class="current-label" id="currentKindLabel">Currently viewing</div>
+        <div class="current-title" id="currentTitle">—</div>
+        <div class="current-sub" id="currentSub">—</div>
+
+        <div class="conn-groups" id="connGroups"></div>
+
+        <div class="path-trail">
+          <div class="group-label">Your path</div>
+          <div class="path-scroll" id="pathScroll"></div>
+        </div>
+      </div>
+      <div class="side-col" id="sideCol">
+        <div class="room-code-box" id="roomCodeBox" style="display:none;">
+          <div class="code" id="roomCodeDisplay">----</div>
+          <small>share this code with friends</small>
+        </div>
+        <h4>Live leaderboard</h4>
+        <div id="leaderboard"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WIN OVERLAY ============ -->
+  <div class="win-overlay" id="winOverlay">
+    <div class="win-card">
+      <div class="badge">🎬</div>
+      <h2 id="winHeading">You connected it!</h2>
+      <p id="winSub">From start to target.</p>
+      <div class="win-stats">
+        <div class="stat">
+          <div class="n" id="winMoves">0</div>
+          <div class="l">moves</div>
+        </div>
+        <div class="stat">
+          <div class="n" id="winTime">0:00</div>
+          <div class="l">time</div>
+        </div>
+        <div class="stat">
+          <div class="n" id="winPar">0</div>
+          <div class="l">shortest possible</div>
+        </div>
+      </div>
+      <div class="win-actions">
+        <button type="button" class="btn-full orange" id="btnRaceAgain">Race again</button>
+        <button type="button" class="btn-full outline" id="btnBackHome">Back to home</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
